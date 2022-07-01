@@ -41,7 +41,7 @@ public class Program
         string krb5Path = Path.Combine(Environment.CurrentDirectory, "krb5.conf");
         if (OperatingSystem.IsLinux())
         {
-            File.WriteAllText(krb5Path, $"[realms]\n{options.DefaultRealm} = {{\n  kdc = {endpoint}\n}}\n");
+            File.WriteAllText(krb5Path, $"[libdefaults]\nkdc_timesync = 0\n\n[realms]\n{options.DefaultRealm} = {{\n  kdc = {endpoint}\n}}\n");
         }
         else
         {
