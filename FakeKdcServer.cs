@@ -48,8 +48,8 @@ class FakeKdcServer
                     var requestRented = ArrayPool<byte>.Shared.Rent(messageSize);
                     var request = requestRented.AsMemory(0, messageSize);
                     await socketStream.ReadExactlyAsync(request);
-                    ArrayPool<byte>.Shared.Return(requestRented);
                     var response = await kdcServer.ProcessMessage(request);
+                    ArrayPool<byte>.Shared.Return(requestRented);
                     var responseLength = response.Length + 4;
                     var responseRented = ArrayPool<byte>.Shared.Rent(responseLength);
                     BinaryPrimitives.WriteInt32BigEndian(responseRented.AsSpan(0, 4), responseLength);
