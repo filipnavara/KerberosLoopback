@@ -1,13 +1,7 @@
 using System.Buffers;
 using System.Buffers.Binary;
-using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using Kerberos.NET.Crypto;
-using Kerberos.NET.Entities;
-using Kerberos.NET.Entities.Pac;
 using Kerberos.NET.Server;
 
 namespace KerberosLoopback;
@@ -47,7 +41,7 @@ class FakeKdcServer
                     var messageSize = BinaryPrimitives.ReadInt32BigEndian(sizeBuffer);
                     var requestRented = ArrayPool<byte>.Shared.Rent(messageSize);
                     var request = requestRented.AsMemory(0, messageSize);
-                    await socketStream.ReadExactlyAsync(request);
+                    await socketStream.ReadExactlyAsync(request);                    
                     var response = await kdcServer.ProcessMessage(request);
                     ArrayPool<byte>.Shared.Return(requestRented);
                     var responseLength = response.Length + 4;
