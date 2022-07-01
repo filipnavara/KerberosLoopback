@@ -39,7 +39,14 @@ public class Program
 
         // Generate krb5.conf
         string krb5Path = Path.Combine(Environment.CurrentDirectory, "krb5.conf");
-        File.WriteAllText(krb5Path, $"[realms]\n{options.DefaultRealm} = {{\n  kdc = tcp/{endpoint}\n}}\n");
+        if (OperatingSystem.IsLinux())
+        {
+            File.WriteAllText(krb5Path, $"[realms]\n{options.DefaultRealm} = {{\n  kdc = {endpoint}\n}}\n");
+        }
+        else
+        {
+            File.WriteAllText(krb5Path, $"[realms]\n{options.DefaultRealm} = {{\n  kdc = tcp/{endpoint}\n}}\n");
+        }
 
         // Generate keytab file
         string keytabPath = Path.Combine(Environment.CurrentDirectory, "krb5.keytab");
