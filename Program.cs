@@ -30,11 +30,12 @@ public class Program
             IsDebug = true,
             RealmLocator = realm => new FakeRealmService(realm)
         };
-        string endpoint = "127.0.0.1:8888";
 
-        options.Configuration.KdcDefaults.KdcTcpListenEndpoints.Clear();
-        options.Configuration.KdcDefaults.KdcTcpListenEndpoints.Add(endpoint);
-        options.Configuration.KdcDefaults.ReceiveTimeout = TimeSpan.FromHours(1);
+        // Start the KDC server
+        var kdcListener = new FakeKdcServer(options);
+        var endpoint = await kdcListener.Start();
+
+        Console.WriteLine("KDC listening at " + endpoint);
 
         // Generate krb5.conf
         string krb5Path = Path.Combine(Environment.CurrentDirectory, "krb5.conf");
@@ -73,10 +74,6 @@ public class Program
         _ = setenv("KRB5_CONFIG", krb5Path, true);
         _ = setenv("KRB5_KTNAME", keytabPath, true);
 
-        // Start the KDC
-        using var listener = new KdcServiceListener(options);
-        _ = listener.Start();
-
         // Do a loopback authentication
         NegotiateAuthenticationClientOptions clientOptions = new()
         {
@@ -107,7 +104,7 @@ public class Program
         }
         while (serverBlob != null && shouldContinue);
 
-        listener.Stop();
+        kdcListener.Stop();
 
         File.Delete(krb5Path);
         File.Delete(keytabPath);
