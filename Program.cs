@@ -46,23 +46,17 @@ public class Program
 
         var etypes = options.Configuration.Defaults.DefaultTgsEncTypes;
         byte[] passwordBytes = FakeKerberosPrincipal.FakePassword;
-        var principal = KrbPrincipalName.FromString("HTTP/corp2.identityintervention.com", PrincipalNameType.NT_SRV_INST, "corp2.identityintervention.com");
 
         foreach (var etype in etypes.Where(CryptoService.SupportsEType))
         {
-            //var keyInfo = saltInfo?.FirstOrDefault(s => s.EType == etype);
-
             var kerbKey = new KerberosKey(
-                //key: null,
                 password: passwordBytes,
                 etype: etype,
-                //salt: keyInfo?.Salt ?? this.Salt,
-                //iterationParams: keyInfo?.S2kParams?.ToArray(),
                 principal: new PrincipalName(
-                    PrincipalNameType.NT_SRV_INST,
+                    PrincipalNameType.NT_PRINCIPAL,
                     options.DefaultRealm,
-                    new [] { "HTTP/corp2.identityintervention.com" })
-                //host: this.Host
+                    new [] { "HTTP/corp2.identityintervention.com" }),
+                saltType: SaltType.ActiveDirectoryUser
             );
 
             keyTable.Entries.Add(new KeyEntry(kerbKey));
@@ -95,9 +89,11 @@ public class Program
 
         byte[]? serverBlob = null;
         byte[]? clientBlob = null;
+        bool shouldContinue = true;
         do
         {
             clientBlob = clientNegotiateAuthentication.GetOutgoingBlob(serverBlob, out NegotiateAuthenticationStatusCode statusCode);
+            shouldContinue = statusCode == NegotiateAuthenticationStatusCode.ContinueNeeded;
             Console.WriteLine("client status: " + statusCode);
             Console.WriteLine("client blob: " + (clientBlob == null ? "null" : Convert.ToHexString(clientBlob)));
             if (clientBlob != null)
@@ -109,7 +105,7 @@ public class Program
                 Console.WriteLine("server blob: " + (serverBlob == null ? "null" : Convert.ToHexString(serverBlob)));
             }
         }
-        while (serverBlob != null);
+        while (serverBlob != null && shouldContinue);
 
         listener.Stop();
 

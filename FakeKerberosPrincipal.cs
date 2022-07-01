@@ -13,7 +13,7 @@ namespace KerberosLoopback;
 
 class FakeKerberosPrincipal : IKerberosPrincipal
 {
-    private const string Realm = "CORP.IDENTITYINTERVENTION.COM";
+    private const string Realm = "CORP2.IDENTITYINTERVENTION.COM";
 
     private static readonly byte[] KrbTgtKey = new byte[]
     {

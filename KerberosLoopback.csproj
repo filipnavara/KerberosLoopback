@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Kerberos.NET" Version="4.5.165" />
+    <!--<Reference Include="../Kerberos.NET/Kerberos.NET/bin/Debug/netstandard2.0/Kerberos.NET.dll" />-->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="7.0.0-preview.5.22301.12" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0-preview.5.22301.12" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0-preview.5.22301.12" />
   </ItemGroup>
