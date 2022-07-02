@@ -13,8 +13,6 @@ namespace KerberosLoopback;
 
 class FakeKerberosPrincipal : IKerberosPrincipal
 {
-    private const string Realm = "CORP2.IDENTITYINTERVENTION.COM";
-
     private static readonly byte[] KrbTgtKey = new byte[]
     {
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -33,9 +31,10 @@ class FakeKerberosPrincipal : IKerberosPrincipal
 
     internal static readonly byte[] FakePassword = Encoding.Unicode.GetBytes("P@ssw0rd!");
 
-    public FakeKerberosPrincipal(string principalName)
+    public FakeKerberosPrincipal(string principalName, string realm)
     {
         this.PrincipalName = principalName;
+        this.Realm = realm;
         this.Expires = DateTimeOffset.UtcNow.AddMonths(9999);
     }
 
@@ -77,7 +76,9 @@ class FakeKerberosPrincipal : IKerberosPrincipal
         }
     }
 
-    public string PrincipalName { get; set; }
+    public string PrincipalName { get; private set; }
+
+    public string Realm { get; private set; }
 
     public DateTimeOffset? Expires { get; set; }
 
@@ -106,12 +107,7 @@ class FakeKerberosPrincipal : IKerberosPrincipal
         return pac;
     }
 
-    private static readonly KerberosKey TgtKey = new(
-        password: KrbTgtKey,
-        principal: new PrincipalName(PrincipalNameType.NT_PRINCIPAL, Realm, new[] { "krbtgt" }),
-        etype: EncryptionType.AES256_CTS_HMAC_SHA1_96,
-        saltType: SaltType.ActiveDirectoryUser
-    );
+    private KerberosKey? TgtKey { get; set; }
 
     private static readonly ConcurrentDictionary<string, KerberosKey> KeyCache = new();
 
@@ -128,7 +124,12 @@ class FakeKerberosPrincipal : IKerberosPrincipal
 
         if (this.PrincipalName.StartsWith("krbtgt", StringComparison.InvariantCultureIgnoreCase))
         {
-            key = TgtKey;
+            key = this.TgtKey ?? (this.TgtKey = new(
+                password: KrbTgtKey,
+                principal: new PrincipalName(PrincipalNameType.NT_PRINCIPAL, Realm, new[] { "krbtgt" }),
+                etype: EncryptionType.AES256_CTS_HMAC_SHA1_96,
+                saltType: SaltType.ActiveDirectoryUser
+            ));
         }
         else
         {

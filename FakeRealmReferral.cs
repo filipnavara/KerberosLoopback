@@ -22,6 +22,6 @@ class FakeRealmReferral : IRealmReferral
 
         var krbName = KrbPrincipalName.FromString($"krbtgt/{predictedRealm}");
 
-        return new FakeKerberosPrincipal(krbName.FullyQualifiedName);
+        return new FakeKerberosPrincipal(krbName.FullyQualifiedName, predictedRealm);
     }
 }

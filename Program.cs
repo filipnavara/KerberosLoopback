@@ -26,7 +26,7 @@ public class Program
         var options = new ListenerOptions
         {
             Log = loggerFactory,
-            DefaultRealm = "corp2.identityintervention.com".ToUpper(),
+            DefaultRealm = "linux.contoso.com".ToUpper(),
             IsDebug = true,
             RealmLocator = realm => new FakeRealmService(realm)
         };
@@ -63,7 +63,7 @@ public class Program
                 principal: new PrincipalName(
                     PrincipalNameType.NT_PRINCIPAL,
                     options.DefaultRealm,
-                    new [] { "HTTP/corp2.identityintervention.com" }),
+                    new [] { $"HTTP/linux.contoso.com" }),
                 saltType: SaltType.ActiveDirectoryUser
             );
 
@@ -85,7 +85,7 @@ public class Program
         NegotiateAuthenticationClientOptions clientOptions = new()
         {
             Credential = new NetworkCredential("user", "P@ssw0rd!", options.DefaultRealm),
-            TargetName = "HTTP/corp2.identityintervention.com"
+            TargetName = $"HTTP/linux.contoso.com"
         };
         NegotiateAuthenticationServerOptions serverOptions = new() { };
         NegotiateAuthentication clientNegotiateAuthentication = new(clientOptions);

@@ -40,7 +40,7 @@ class FakePrincipalService : IPrincipalService
             principalName.Type == PrincipalNameType.NT_PRINCIPAL)
             && !fallback)
         {
-            principal = new FakeKerberosPrincipal(principalName.FullyQualifiedName);
+            principal = new FakeKerberosPrincipal(principalName.FullyQualifiedName, this.realm);
         }
 
         return principal;
